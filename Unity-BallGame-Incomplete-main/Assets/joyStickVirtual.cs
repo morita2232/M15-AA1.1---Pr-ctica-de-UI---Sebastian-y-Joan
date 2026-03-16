@@ -45,6 +45,8 @@ public class joyStickVirtual : MonoBehaviour, IDragHandler, IEndDragHandler, IBe
             ballController.Jump();
         }
 
+        ballController.Move(input);
+
     }
 
     public void OnBeginDrag(PointerEventData data)
@@ -88,8 +90,7 @@ public class joyStickVirtual : MonoBehaviour, IDragHandler, IEndDragHandler, IBe
         dir /= maxRadius;
 
         input = dir;
-        
-        ballController.Move(input);
+                
 
     }
 
