@@ -63,4 +63,17 @@ public class Settings : MonoBehaviour
             resizer.ResetWidth(originalWidth);
         }
     }
+
+
+
+
+    public void GoSettings()
+    {
+
+    }
+
+    public void GoArt()
+    {
+
+    }
 }
