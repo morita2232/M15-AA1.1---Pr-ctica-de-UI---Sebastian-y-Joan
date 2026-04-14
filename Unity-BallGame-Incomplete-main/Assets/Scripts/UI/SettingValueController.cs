@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -16,6 +17,8 @@ public class SettingValueController : MonoBehaviour
     public TMP_InputField inputField;
     public Slider slider;
     public TextMeshProUGUI valueText;
+    public CameraInput camInput;
+    public joyStickVirtual joyStickVirtual;
 
     [Header("Events")]
     public UnityEvent<float> onValueChanged;
@@ -91,7 +94,17 @@ public class SettingValueController : MonoBehaviour
         safeArea.Apply();
     }
 
+    public void RepositionTF(bool value)
+    {
+        joyStickVirtual.reposition = value;
+    }
 
+
+    public void SetSensitivity(float newValue)
+    {
+        value = newValue;                      // keep UI value in sync
+        camInput.rotationSpeed = newValue;     // THIS is what you actually need
+    }
 
     void UpdateAll()
     {

@@ -1,30 +1,30 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-[RequireComponent(typeof(CameraController))]
-public class CameraInput : MonoBehaviour
+public class SwipeRotate : MonoBehaviour
 {
-    private CameraController controller;
-
-    [Header("Input Settings")]
+    [Header("Rotation Settings")]
     public float rotationSpeed = 0.2f;
-    
+    public float smoothSpeed = 10f;
 
+    private float desiredRotation = 0f;
     private float lastX;
     private bool isDragging = false;
 
-    void Start()
-    {
-        controller = GetComponent<CameraController>();
-    }
-
     void Update()
     {
-      
+        
         if (IsPointerOverUI())
             return;
 
         HandleInput();
+
+        
+        transform.rotation = Quaternion.Lerp(
+            transform.rotation,
+            Quaternion.Euler(0, desiredRotation, 0),
+            Time.deltaTime * smoothSpeed
+        );
     }
 
     void HandleInput()
@@ -44,14 +44,14 @@ public class CameraInput : MonoBehaviour
                 float deltaX = touch.position.x - lastX;
                 lastX = touch.position.x;
 
-                controller.Rotate(deltaX * rotationSpeed);
+                Rotate(deltaX);
             }
             else if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
             {
                 isDragging = false;
             }
 
-            return;
+            return; 
         }
 
         
@@ -65,7 +65,7 @@ public class CameraInput : MonoBehaviour
             float deltaX = Input.mousePosition.x - lastX;
             lastX = Input.mousePosition.x;
 
-            controller.Rotate(deltaX * rotationSpeed);
+            Rotate(deltaX);
         }
         else if (Input.GetMouseButtonUp(0))
         {
@@ -73,11 +73,19 @@ public class CameraInput : MonoBehaviour
         }
     }
 
+    public void Rotate(float value)
+    {
+        desiredRotation += value * rotationSpeed;
+    }
+
+    
     bool IsPointerOverUI()
     {
+        // Mouse
         if (EventSystem.current.IsPointerOverGameObject())
             return true;
 
+        // Touch
         if (Input.touchCount > 0)
         {
             if (EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
@@ -86,7 +94,4 @@ public class CameraInput : MonoBehaviour
 
         return false;
     }
-
-
-
 }

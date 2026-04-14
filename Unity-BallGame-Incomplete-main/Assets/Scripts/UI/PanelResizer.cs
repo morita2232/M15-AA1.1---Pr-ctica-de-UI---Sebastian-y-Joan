@@ -7,11 +7,11 @@ public class PanelResizer : MonoBehaviour, IBeginDragHandler, IDragHandler
     [Header("Panel")]
     public RectTransform panelTransform;
 
-    [Header("Content (fixed at X = 0)")]
+    [Header("Content")]
     public RectTransform contentTransform;
 
-    [Header("Layout Group")]
-    public HorizontalLayoutGroup layoutGroup;
+    [Header("All Layout Groups")]
+    private HorizontalOrVerticalLayoutGroup[] layoutGroups;
 
     [Header("Width Limits")]
     public float minWidth = 100f;
@@ -24,6 +24,12 @@ public class PanelResizer : MonoBehaviour, IBeginDragHandler, IDragHandler
     private Vector2 startMousePos;
     private float startWidth;
 
+    void Awake()
+    {
+        // Finds BOTH horizontal AND vertical layout groups
+        layoutGroups = panelTransform.GetComponentsInChildren<HorizontalOrVerticalLayoutGroup>();
+    }
+
     public void OnBeginDrag(PointerEventData eventData)
     {
         startMousePos = eventData.position;
@@ -33,27 +39,30 @@ public class PanelResizer : MonoBehaviour, IBeginDragHandler, IDragHandler
     public void OnDrag(PointerEventData eventData)
     {
         float deltaX = eventData.position.x - startMousePos.x;
-
         float newWidth = Mathf.Clamp(startWidth + deltaX, minWidth, maxWidth);
 
         // Resize panel
         panelTransform.sizeDelta = new Vector2(newWidth, panelTransform.sizeDelta.y);
 
-        // Keep content locked at X = 0
+        // Lock content
         contentTransform.anchoredPosition = new Vector2(0, contentTransform.anchoredPosition.y);
 
-        // Dynamic spacing
         float t = Mathf.InverseLerp(minWidth, maxWidth, newWidth);
         float spacing = Mathf.Lerp(minSpacing, maxSpacing, t);
 
-        layoutGroup.spacing = spacing;
+        foreach (var group in layoutGroups)
+        {
+            group.spacing = spacing;
+        }
     }
 
     public void ResetWidth(float width)
     {
         startWidth = width;
 
-        // Reset spacing too
-        layoutGroup.spacing = maxSpacing;
+        foreach (var group in layoutGroups)
+        {
+            group.spacing = maxSpacing;
+        }
     }
 }
