@@ -40,7 +40,7 @@ public class SettingValueController : MonoBehaviour
     {
         value += step;
         ClampValue();
-        UpdateUI();
+        UpdateAll();
     }
 
     // Botón -
@@ -48,7 +48,7 @@ public class SettingValueController : MonoBehaviour
     {
         value -= step;
         ClampValue();
-        UpdateUI();
+        UpdateAll();
     }
 
     // Cuando escribes en el input
