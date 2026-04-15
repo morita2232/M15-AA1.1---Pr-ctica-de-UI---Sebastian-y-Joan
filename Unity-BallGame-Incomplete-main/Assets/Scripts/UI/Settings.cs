@@ -21,7 +21,7 @@ public class Settings : MonoBehaviour
     private Vector2 targetPos;
 
     // ORIGINAL VALUES
-    private float originalWidth;
+    private float originalRight;
     private Vector2 originalContentPos;
 
     private void Start()
@@ -29,8 +29,8 @@ public class Settings : MonoBehaviour
         targetPos = new Vector2(-truePos, 0);
         panelTransform.anchoredPosition = targetPos;
 
-        // Save original values
-        originalWidth = panelTransform.sizeDelta.x;
+        // Save original values (IMPORTANT: convert from negative)
+        originalRight = -panelTransform.offsetMax.x;
         originalContentPos = contentTransform.anchoredPosition;
     }
 
@@ -53,27 +53,23 @@ public class Settings : MonoBehaviour
 
         Time.timeScale = isClicked ? 0f : 1f;
 
-        //  RESET when closing
+        // RESET when closing
         if (!isClicked)
         {
-            panelTransform.sizeDelta = new Vector2(originalWidth, panelTransform.sizeDelta.y);
+            // Restore RIGHT value
+            Vector2 offsetMax = panelTransform.offsetMax;
+            offsetMax.x = -originalRight;
+            panelTransform.offsetMax = offsetMax;
+
+            // Restore content
             contentTransform.anchoredPosition = originalContentPos;
 
-            // also reset resizer state
-            resizer.ResetWidth(originalWidth);
+            // Sync resizer
+            resizer.ResetRight(originalRight);
         }
     }
 
+    public void GoSettings() { }
 
-
-
-    public void GoSettings()
-    {
-
-    }
-
-    public void GoArt()
-    {
-
-    }
+    public void GoArt() { }
 }

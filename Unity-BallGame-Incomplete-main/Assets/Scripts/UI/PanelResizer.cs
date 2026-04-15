@@ -13,41 +13,47 @@ public class PanelResizer : MonoBehaviour, IBeginDragHandler, IDragHandler
     [Header("All Layout Groups")]
     private HorizontalOrVerticalLayoutGroup[] layoutGroups;
 
-    [Header("Width Limits")]
-    public float minWidth = 100f;
-    public float maxWidth = 600f;
+    [Header("Right Limits")]
+    public float minRight = 100f;
+    public float maxRight = 600f;
 
     [Header("Spacing Limits")]
     public float minSpacing = 5f;
     public float maxSpacing = 50f;
 
     private Vector2 startMousePos;
-    private float startWidth;
+    private float startRight;
 
     void Awake()
     {
-        // Finds BOTH horizontal AND vertical layout groups
         layoutGroups = panelTransform.GetComponentsInChildren<HorizontalOrVerticalLayoutGroup>();
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
         startMousePos = eventData.position;
-        startWidth = panelTransform.sizeDelta.x;
+
+        // Convert from Unity negative to usable positive value
+        startRight = -panelTransform.offsetMax.x;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
         float deltaX = eventData.position.x - startMousePos.x;
-        float newWidth = Mathf.Clamp(startWidth + deltaX, minWidth, maxWidth);
 
-        // Resize panel
-        panelTransform.sizeDelta = new Vector2(newWidth, panelTransform.sizeDelta.y);
+        float newRight = Mathf.Clamp(startRight - deltaX, minRight, maxRight);
 
-        // Lock content
-        contentTransform.anchoredPosition = new Vector2(0, contentTransform.anchoredPosition.y);
+        // Apply RIGHT (convert back to negative)
+        Vector2 offsetMax = panelTransform.offsetMax;
+        offsetMax.x = -newRight;
+        panelTransform.offsetMax = offsetMax;
 
-        float t = Mathf.InverseLerp(minWidth, maxWidth, newWidth);
+        // Lock content position
+        contentTransform.anchoredPosition =
+            new Vector2(0, contentTransform.anchoredPosition.y);
+
+        // Adjust spacing dynamically
+        float t = Mathf.InverseLerp(minRight, maxRight, newRight);
         float spacing = Mathf.Lerp(minSpacing, maxSpacing, t);
 
         foreach (var group in layoutGroups)
@@ -56,9 +62,9 @@ public class PanelResizer : MonoBehaviour, IBeginDragHandler, IDragHandler
         }
     }
 
-    public void ResetWidth(float width)
+    public void ResetRight(float right)
     {
-        startWidth = width;
+        startRight = right;
 
         foreach (var group in layoutGroups)
         {
