@@ -2,74 +2,50 @@ using UnityEngine;
 
 public class Settings : MonoBehaviour
 {
-    [Header("Panel")]
     public RectTransform panelTransform;
-
-    [Header("Content that should move")]
-    public RectTransform contentTransform;
-
-    [Header("Resizer script")]
     public PanelResizer resizer;
 
-    [Header("UI Elements")]
     public GameObject pauseLines;
     public GameObject pauseX;
     public GameObject scaleLines;
 
-    private bool isClicked = false;
-    private float truePos = 500f;
-    private Vector2 targetPos;
+    private bool isOpen = false;
 
-    // ORIGINAL VALUES
-    private float originalRight;
-    private Vector2 originalContentPos;
+    private float closedX = -1440f;
+    private float openX = -950f;
 
-    private void Start()
+    void Start()
     {
-        targetPos = new Vector2(-truePos, 0);
-        panelTransform.anchoredPosition = targetPos;
+        panelTransform.anchoredPosition = new Vector2(closedX, 0);
 
-        // Save original values (IMPORTANT: convert from negative)
-        originalRight = -panelTransform.offsetMax.x;
-        originalContentPos = contentTransform.anchoredPosition;
+        // lock width
+        panelTransform.sizeDelta = new Vector2(500f, panelTransform.sizeDelta.y);
     }
 
     void Update()
     {
-        panelTransform.anchoredPosition =
-            Vector2.Lerp(panelTransform.anchoredPosition, targetPos, 10f * Time.unscaledDeltaTime);
+        float targetX = isOpen ? openX : closedX;
+
+        Vector2 pos = panelTransform.anchoredPosition;
+
+        pos.x = Mathf.Lerp(pos.x, targetX, 10f * Time.unscaledDeltaTime);
+
+        panelTransform.anchoredPosition = pos;
     }
 
-    public void ShowPanel()
+    public void TogglePanel()
     {
-        isClicked = !isClicked;
+        isOpen = !isOpen;
 
-        pauseLines.SetActive(!isClicked);
-        scaleLines.SetActive(isClicked);
-        pauseX.SetActive(isClicked);
+        pauseLines.SetActive(!isOpen);
+        scaleLines.SetActive(isOpen);
+        pauseX.SetActive(isOpen);
 
-        float pos = isClicked ? 0 : -truePos;
-        targetPos = new Vector2(pos, 0);
+        Time.timeScale = isOpen ? 0f : 1f;
 
-        Time.timeScale = isClicked ? 0f : 1f;
-
-        // RESET when closing
-        if (!isClicked)
+        if (!isOpen)
         {
-            // Restore RIGHT value
-            Vector2 offsetMax = panelTransform.offsetMax;
-            offsetMax.x = -originalRight;
-            panelTransform.offsetMax = offsetMax;
-
-            // Restore content
-            contentTransform.anchoredPosition = originalContentPos;
-
-            // Sync resizer
-            resizer.ResetRight(originalRight);
+            resizer.ResetWidth();
         }
     }
-
-    public void GoSettings() { }
-
-    public void GoArt() { }
 }

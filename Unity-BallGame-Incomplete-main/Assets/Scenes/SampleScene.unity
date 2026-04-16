@@ -4429,9 +4429,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   panelTransform: {fileID: 1002604215}
-  contentTransform: {fileID: 1002604215}
-  minRight: 50
-  maxRight: 980
+  minWidth: 300
+  maxWidth: 1000
   minSpacing: 5
   maxSpacing: 100
 --- !u!1 &410087039
@@ -8535,7 +8534,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   panelTransform: {fileID: 1002604215}
-  contentTransform: {fileID: 54478286}
   resizer: {fileID: 402053617}
   pauseLines: {fileID: 299733970}
   pauseX: {fileID: 52399972}
@@ -11221,11 +11219,11 @@ RectTransform:
   - {fileID: 402053616}
   m_Father: {fileID: 510386208}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -500, y: 0}
-  m_SizeDelta: {x: -940, y: 0}
-  m_Pivot: {x: 0, y: 0}
+  m_AnchorMin: {x: 1, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: -1439.9999, y: 0}
+  m_SizeDelta: {x: 500, y: 810}
+  m_Pivot: {x: 1, y: 0.5}
 --- !u!114 &1002604216
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12764,7 +12762,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 750334981}
         m_TargetAssemblyTypeName: Settings, Assembly-CSharp
-        m_MethodName: ShowPanel
+        m_MethodName: TogglePanel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

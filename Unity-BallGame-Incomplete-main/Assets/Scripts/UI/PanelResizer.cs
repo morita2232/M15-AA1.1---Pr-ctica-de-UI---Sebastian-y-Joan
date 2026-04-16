@@ -7,24 +7,25 @@ public class PanelResizer : MonoBehaviour, IBeginDragHandler, IDragHandler
     [Header("Panel")]
     public RectTransform panelTransform;
 
-    [Header("Content")]
-    public RectTransform contentTransform;
+    [Header("Limits")]
+    public float minWidth = 300f;
+    public float maxWidth = 1000f;
 
-    [Header("All Layout Groups")]
-    private HorizontalOrVerticalLayoutGroup[] layoutGroups;
-
-    [Header("Right Limits")]
-    public float minRight = 100f;
-    public float maxRight = 600f;
-
-    [Header("Spacing Limits")]
+    [Header("Spacing")]
     public float minSpacing = 5f;
     public float maxSpacing = 50f;
 
+    private float startWidth;
     private Vector2 startMousePos;
-    private float startRight;
+
+    private HorizontalOrVerticalLayoutGroup[] layoutGroups;
 
     void Awake()
+    {
+        RefreshLayoutGroups();
+    }
+
+    void RefreshLayoutGroups()
     {
         layoutGroups = panelTransform.GetComponentsInChildren<HorizontalOrVerticalLayoutGroup>();
     }
@@ -32,43 +33,42 @@ public class PanelResizer : MonoBehaviour, IBeginDragHandler, IDragHandler
     public void OnBeginDrag(PointerEventData eventData)
     {
         startMousePos = eventData.position;
-
-        // Convert from Unity negative to usable positive value
-        startRight = -panelTransform.offsetMax.x;
+        startWidth = panelTransform.sizeDelta.x;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        float deltaX = eventData.position.x - startMousePos.x;
+        float delta = eventData.position.x - startMousePos.x;
 
-        float newRight = Mathf.Clamp(startRight - deltaX, minRight, maxRight);
+        float newWidth = Mathf.Clamp(startWidth - delta, minWidth, maxWidth);
 
-        // Apply RIGHT (convert back to negative)
-        Vector2 offsetMax = panelTransform.offsetMax;
-        offsetMax.x = -newRight;
-        panelTransform.offsetMax = offsetMax;
+        Vector2 size = panelTransform.sizeDelta;
+        size.x = newWidth;
+        panelTransform.sizeDelta = size;
 
-        // Lock content position
-        contentTransform.anchoredPosition =
-            new Vector2(0, contentTransform.anchoredPosition.y);
+        UpdateSpacing(newWidth);
+    }
 
-        // Adjust spacing dynamically
-        float t = Mathf.InverseLerp(minRight, maxRight, newRight);
+    void UpdateSpacing(float width)
+    {
+        float t = Mathf.InverseLerp(minWidth, maxWidth, width);
         float spacing = Mathf.Lerp(minSpacing, maxSpacing, t);
 
         foreach (var group in layoutGroups)
         {
+            if (group == null) continue;
             group.spacing = spacing;
         }
     }
 
-    public void ResetRight(float right)
+    public void ResetWidth()
     {
-        startRight = right;
+        float defaultWidth = 500f;
 
-        foreach (var group in layoutGroups)
-        {
-            group.spacing = maxSpacing;
-        }
+        Vector2 size = panelTransform.sizeDelta;
+        size.x = defaultWidth;
+        panelTransform.sizeDelta = size;
+
+        UpdateSpacing(defaultWidth);
     }
 }

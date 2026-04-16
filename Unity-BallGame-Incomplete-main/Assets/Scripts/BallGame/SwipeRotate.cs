@@ -13,7 +13,7 @@ public class SwipeRotate : MonoBehaviour
 
     void Update()
     {
-        
+        Debug.Log("EXISTO");
         if (IsPointerOverUI())
             return;
 
